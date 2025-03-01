@@ -48,8 +48,8 @@ public protocol ScaleView: FractionableView, Equatable {
 extension ScaleView {
     var body: some View {
         shape
-            .frame(size: .init(width: width, height: height))
-            .fixedSize()
+        .frame(size: .init(width: width, height: height))
+        .fixedSize()
     }
 
     var unitMarkOffset: CGFloat { 0 }
@@ -61,4 +61,6 @@ extension ScaleView {
     }
 }
 
-
+#Preview {
+  ExampleRuler()
+}

@@ -78,7 +78,7 @@ struct DefaultScaleView: ScaleView {
 struct ScaleView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            DefaultScaleView(width: 120)
+          DefaultScaleView(width: 120)
         }
         .previewLayout(.sizeThatFits)
     }

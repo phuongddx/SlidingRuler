@@ -35,7 +35,8 @@ struct BlankCellBody: NativeRulerCellView {
     var step: CGFloat
     var cellWidth: CGFloat
 
-    var scale: some ScaleView { DefaultScaleView(width: cellWidth) }
+//    var scale: some ScaleView { DefaultScaleView(width: cellWidth) }
+  var scale: some ScaleView { DefaultVerticalScaleView(height: cellWidth) }
 }
 
 struct DefaultCellBody: NativeMarkedRulerCellView {

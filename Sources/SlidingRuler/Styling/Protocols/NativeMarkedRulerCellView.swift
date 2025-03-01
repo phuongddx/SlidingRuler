@@ -30,6 +30,7 @@
 import SwiftUI
 
 protocol NativeMarkedRulerCellView: MarkedRulerCellView { }
+
 extension NativeMarkedRulerCellView {
     var markColor: Color {
         bounds.contains(mark) ? .init(.label) : .init(.tertiaryLabel)
@@ -47,4 +48,24 @@ extension NativeMarkedRulerCellView {
         }
         .fixedSize()
     }
+}
+
+struct ExampleRuler: View {
+  @State private var value: Double = .zero
+  
+  var body: some View {
+    VStack {
+      SlidingRuler(value: $value,
+                   in: 11...17,
+                   step: 1,
+                   snap: .unit,
+                   tick: .none)
+//      .frame(height: 400)
+      Spacer()
+    }
+  }
+}
+
+#Preview {
+  ExampleRuler()
 }

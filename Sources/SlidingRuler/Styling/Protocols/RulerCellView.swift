@@ -69,3 +69,7 @@ extension RulerCellView {
         lhs.isComplete && rhs.isComplete
     }
 }
+
+#Preview {
+  ExampleRuler()
+}

@@ -45,3 +45,7 @@ public protocol MarkedRulerCellView: FractionableView {
 extension MarkedRulerCellView {
     static var fractions: Int { CellView.fractions }
 }
+
+#Preview {
+  ExampleRuler()
+}

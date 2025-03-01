@@ -38,3 +38,7 @@ extension FractionableView {
     static var fractions: Int { 10 }
     static var hasHalf: Bool { fractions.isEven }
 }
+
+#Preview {
+  ExampleRuler()
+}
