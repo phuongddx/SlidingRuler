@@ -30,37 +30,51 @@
 import SwiftUI
 
 struct Ruler: View, Equatable {
-    @Environment(\.slidingRulerStyle) private var style
-    
-    let cells: [RulerCell]
-    let step: CGFloat
-    let markOffset: CGFloat
-    let bounds: ClosedRange<CGFloat>
-    let formatter: NumberFormatter?
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(self.cells) { cell in
-                self.style.makeCellBody(configuration: self.configuration(forCell: cell))
-            }
-        }
-        .animation(nil)
+  @Environment(\.slidingRulerStyle) private var style
+  
+  let cells: [RulerCell]
+  let step: CGFloat
+  let markOffset: CGFloat
+  let bounds: ClosedRange<CGFloat>
+  let formatter: NumberFormatter?
+  
+  var body: some View {
+    HStack(spacing: 0) {
+      ForEach(self.cells) { cell in
+        self.style.makeCellBody(configuration: self.configuration(forCell: cell))
+      }
     }
-    
-    private func configuration(forCell cell: RulerCell) -> SlidingRulerStyleConfiguation {
-        return .init(mark: (cell.mark + markOffset) * step, bounds: bounds, step: step, formatter: formatter)
+    .animation(nil)
+  }
+  
+  private func configuration(
+    forCell cell: RulerCell) -> SlidingRulerStyleConfiguation {
+      return .init(mark: (cell.mark + markOffset) * step, bounds: bounds, step: step, formatter: formatter)
     }
-    
-    static func ==(lhs: Self, rhs: Self) -> Bool {
-        lhs.step == rhs.step &&
-        lhs.cells.count == rhs.cells.count &&
-        (!StaticSlidingRulerStyleEnvironment.hasMarks || lhs.markOffset == rhs.markOffset)
-    }
+  
+  static func ==(lhs: Self, rhs: Self) -> Bool {
+    lhs.step == rhs.step &&
+    lhs.cells.count == rhs.cells.count &&
+    (!StaticSlidingRulerStyleEnvironment.hasMarks || lhs.markOffset == rhs.markOffset)
+  }
 }
 
-struct Ruler_Previews: PreviewProvider {
-    static var previews: some View {
-        Ruler(cells: [.init(CGFloat(0))],
-              step: 1.0, markOffset: 0, bounds: -1...1, formatter: nil)
+struct PreviewRuler: View {
+  @State private var value: Double = .zero
+  var body: some View {
+    VStack {
+      Ruler(cells: [.init(CGFloat(0))],
+            step: 1.0, markOffset: 0, bounds: -1...1, formatter: nil)
+      SlidingRuler(value: $value,
+                   in: 1...5,
+                   step: 1,
+                   snap: .half,
+                   tick: .fraction,
+                   formatter: nil)
     }
+  }
+}
+
+#Preview {
+  PreviewRuler()
 }

@@ -147,12 +147,16 @@ public struct SlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bina
     (renderedValue, renderedOffset) = renderingValues()
     
     return FlexibleWidthContainer {
-      
-      ZStack(alignment: .init(horizontal: .center, vertical: self.verticalCursorAlignment)) {
-        Ruler(cells: self.cells, step: self.step, markOffset: self.markOffset, bounds: self.bounds, formatter: self.formatter)
-          .equatable()
-          .animation(nil)
-          .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: self.cellWidthOverflow))
+      ZStack(alignment: .init(horizontal: .center,
+                              vertical: self.verticalCursorAlignment)) {
+        Ruler(cells: self.cells,
+              step: self.step,
+              markOffset: self.markOffset,
+              bounds: self.bounds,
+              formatter: self.formatter)
+        .equatable()
+        .animation(nil)
+        .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: self.cellWidthOverflow))
         self.style.makeCursorBody()
       }
     }
@@ -543,3 +547,22 @@ extension SlidingRuler {
   }
 }
 
+
+struct PercentSlidingRuler: View {
+  @State private var value: Double = .zero
+
+  var body: some View {
+    VStack {
+      SlidingRuler(value: $value,
+                   in: 1...5,
+                   step: 1,
+                   snap: .half,
+                   tick: .fraction,
+                   formatter: nil)
+    }
+  }
+}
+
+#Preview {
+  PercentSlidingRuler()
+}

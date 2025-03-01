@@ -39,7 +39,7 @@ extension NativeMarkedRulerCellView {
     var body: some View {
         VStack {
             cell.equatable()
-            Spacer()
+          Spacer()
             Text(verbatim: displayMark)
                 .font(Font.footnote.monospacedDigit())
                 .foregroundColor(markColor)
@@ -48,3 +48,8 @@ extension NativeMarkedRulerCellView {
         .fixedSize()
     }
 }
+
+#Preview {
+  PercentSlidingRuler()
+}
+

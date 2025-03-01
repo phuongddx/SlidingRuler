@@ -30,32 +30,37 @@
 import SwiftUI
 
 struct AnySlidingRulerStyle: SlidingRulerStyle {
-    private let cellProvider: (SlidingRulerStyleConfiguation) -> AnyFractionableView
-    private let cursorProvider: () -> AnyView
+  private let cellProvider: (SlidingRulerStyleConfiguation) -> AnyFractionableView
+  private let cursorProvider: () -> AnyView
+  
+  let fractions: Int
+  let cellWidth: CGFloat
+  let cursorAlignment: VerticalAlignment
+  let hasMarks: Bool
+  
+  init<T: SlidingRulerStyle> (style: T) {
+    self.cellProvider = { (configuration: SlidingRulerStyleConfiguation) -> AnyFractionableView in
+      AnyFractionableView(style.makeCellBody(configuration: configuration))
+    }
+    self.cursorProvider = {
+      AnyView(style.makeCursorBody())
+    }
+    self.fractions = style.fractions
+    self.cellWidth = style.cellWidth
+    self.cursorAlignment = style.cursorAlignment
+    self.hasMarks = style.hasMarks
+  }
+  
+  func makeCellBody(
+    configuration: SlidingRulerStyleConfiguation) -> some FractionableView {
+      cellProvider(configuration)
+    }
+  
+  func makeCursorBody() -> some View {
+    cursorProvider()
+  }
+}
 
-    let fractions: Int
-    let cellWidth: CGFloat
-    let cursorAlignment: VerticalAlignment
-    let hasMarks: Bool
-    
-    init<T: SlidingRulerStyle> (style: T) {
-        self.cellProvider = { (configuration: SlidingRulerStyleConfiguation) -> AnyFractionableView in
-            AnyFractionableView(style.makeCellBody(configuration: configuration))
-        }
-        self.cursorProvider = {
-            AnyView(style.makeCursorBody())
-        }
-        self.fractions = style.fractions
-        self.cellWidth = style.cellWidth
-        self.cursorAlignment = style.cursorAlignment
-        self.hasMarks = style.hasMarks
-    }
-    
-    func makeCellBody(configuration: SlidingRulerStyleConfiguation) -> some FractionableView {
-        cellProvider(configuration)
-    }
-    
-    func makeCursorBody() -> some View {
-        cursorProvider()
-    }
+#Preview {
+  PercentSlidingRuler()
 }
