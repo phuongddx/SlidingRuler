@@ -378,10 +378,6 @@ extension SlidingRuler {
     }
 }
 
-extension UIScrollView.DecelerationRate {
-    static var ruler: Self { Self.init(rawValue: 0.9972) }
-}
-
 // MARK: Mechanic Simulation
 extension SlidingRuler {
 
