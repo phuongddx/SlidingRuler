@@ -1,90 +1,82 @@
-//
-//  DragGestureManagement.swift
-//  SlidingRuler
-//
-//  Created by Phuong Doan Duy on 2/3/25.
-//
-
-
 // MARK: Drag Gesture Management
+
 extension VerticalSlidingRuler {
-  
   /// Callback handling first touch event.
-  internal func firstTouchHappened() {
+  func firstTouchHappened() {
     switch state {
-      case .flicking:
-        cancelCurrentTimer()
-        state = .stoppedFlick
-      case .springing:
-        cancelCurrentTimer()
-        state = .stoppedSpring
-      default: break
+    case .flicking:
+      cancelCurrentTimer()
+      state = .stoppedFlick
+    case .springing:
+      cancelCurrentTimer()
+      state = .stoppedSpring
+    default: break
     }
   }
-  
+
   /// Callback handling gesture premature ending.
-  internal func panGestureEndedPrematurely() {
+  func panGestureEndedPrematurely() {
     switch state {
-      case .stoppedFlick:
-        state = .idle
-        snapIfNeeded()
-      case .stoppedSpring:
-        releaseRubberBand()
-      default:
-        break
+    case .stoppedFlick:
+      state = .idle
+      snapIfNeeded()
+    case .stoppedSpring:
+      releaseRubberBand()
+    default:
+      break
     }
   }
-  
+
   /// Composite callback passed to the horizontal drag gesture recognizer.
-  internal func horizontalDragAction(withValue value: HorizontalDragGestureValue) {
+  func horizontalDragAction(withValue value: HorizontalDragGestureValue) {
     switch value.state {
-      case .began: horizontalDragBegan(value)
-      case .changed: horizontalDragChanged(value)
-      case .ended: horizontalDragEnded(value)
-      default: return
+    case .began: horizontalDragBegan(value)
+    case .changed: horizontalDragChanged(value)
+    case .ended: horizontalDragEnded(value)
+    default: return
     }
   }
-  
+
   /// Callback handling horizontal drag gesture begining.
-  internal func horizontalDragBegan(_ value: HorizontalDragGestureValue) {
+  func horizontalDragBegan(_: HorizontalDragGestureValue) {
     editingChangedCallback(true)
     if state != .stoppedSpring {
-      dragOffset = self.offset(fromValue: clampedValue ?? 0)
+      dragOffset = offset(fromValue: clampedValue)
     }
     referenceOffset = dragOffset
     state = .dragging
   }
-  
+
   /// Callback handling horizontal drag gesture updating.
-  internal func horizontalDragChanged(_ value: HorizontalDragGestureValue) {
-    let newOffset = self.directionalOffset(value.translation.horizontal + referenceOffset)
+  func horizontalDragChanged(_ value: HorizontalDragGestureValue) {
+    let newOffset = directionalOffset(value.translation.horizontal + referenceOffset)
     let newValue = self.value(fromOffset: newOffset)
-    
-    self.tickIfNeeded(dragOffset, newOffset)
-    
+
+    tickIfNeeded(dragOffset, newOffset)
+
     withoutAnimation {
       self.setValue(newValue)
       dragOffset = self.applyRubber(to: newOffset)
     }
   }
-  
+
   /// Callback handling horizontal drag gesture ending.
-  internal func horizontalDragEnded(_ value: HorizontalDragGestureValue) {
+  func horizontalDragEnded(_ value: HorizontalDragGestureValue) {
     if isRubberBandNeedingRelease {
-      self.releaseRubberBand()
-      self.endDragSession()
+      releaseRubberBand()
+      endDragSession()
     } else if abs(value.velocity) > 90 {
-      self.applyInertia(initialVelocity: value.velocity)
+      applyInertia(initialVelocity: value.velocity)
     } else {
       state = .idle
-      self.endDragSession()
-      self.snapIfNeeded()
+      endDragSession()
+      snapIfNeeded()
     }
   }
-  
+
   /// Drag session clean-up.
-  internal func endDragSession() {
+  func endDragSession() {
     referenceOffset = .zero
-    self.editingChangedCallback(false)
+    editingChangedCallback(false)
   }
 }

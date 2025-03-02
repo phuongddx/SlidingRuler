@@ -1,0 +1,8 @@
+# SwiftFormat version (recommend using the latest version)
+--swiftversion 6.0
+
+# Specific formatting options
+--indent 2              # Indent with 4 spaces
+--linebreaks lf         # Use LF (Unix-style) line breaks
+--stripunusedargs always # Remove unused arguments in closures
+--header strip          # Remove default header if not needed
