@@ -29,33 +29,39 @@
 
 import SwiftUI
 
-struct AnySlidingRulerStyle: SlidingRulerStyle {
-    private let cellProvider: (SlidingRulerStyleConfiguation) -> AnyFractionableView
-    private let cursorProvider: () -> AnyView
+public enum RulerDirection {
+  case vertical
+  case horizontal
+}
 
-    let fractions: Int
-    let cellWidth: CGFloat
-    let cursorAlignment: VerticalAlignment
-    let hasMarks: Bool
-    
-    init<T: SlidingRulerStyle> (style: T) {
-        self.cellProvider = { (configuration: SlidingRulerStyleConfiguation) -> AnyFractionableView in
-            AnyFractionableView(style.makeCellBody(configuration: configuration))
-        }
-        self.cursorProvider = {
-            AnyView(style.makeCursorBody())
-        }
-        self.fractions = style.fractions
-        self.cellWidth = style.cellWidth
-        self.cursorAlignment = style.cursorAlignment
-        self.hasMarks = style.hasMarks
+struct AnySlidingRulerStyle: SlidingRulerStyle {
+  private let cellProvider: (SlidingRulerStyleConfiguation) -> AnyFractionableView
+  private let cursorProvider: () -> AnyView
+  
+  let fractions: Int
+  let cellWidth: CGFloat
+  let cursorAlignment: VerticalAlignment
+  let hasMarks: Bool
+//  let direction: RulerDirection
+  
+  init<T: SlidingRulerStyle> (style: T) {
+    self.cellProvider = { (configuration: SlidingRulerStyleConfiguation) -> AnyFractionableView in
+      AnyFractionableView(style.makeCellBody(configuration: configuration))
     }
-    
-    func makeCellBody(configuration: SlidingRulerStyleConfiguation) -> some FractionableView {
-        cellProvider(configuration)
+    self.cursorProvider = {
+      AnyView(style.makeCursorBody())
     }
-    
-    func makeCursorBody() -> some View {
-        cursorProvider()
-    }
+    self.fractions = style.fractions
+    self.cellWidth = style.cellWidth
+    self.cursorAlignment = style.cursorAlignment
+    self.hasMarks = style.hasMarks
+  }
+  
+  func makeCellBody(configuration: SlidingRulerStyleConfiguation) -> some FractionableView {
+    cellProvider(configuration)
+  }
+  
+  func makeCursorBody() -> some View {
+    cursorProvider()
+  }
 }

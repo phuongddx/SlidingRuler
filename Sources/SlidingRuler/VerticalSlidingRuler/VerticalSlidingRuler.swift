@@ -118,7 +118,11 @@ public struct VerticalSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stri
 
     return FlexibleWidthContainer {
       ZStack(alignment: .init(horizontal: .center, vertical: verticalCursorAlignment)) {
-        Ruler(cells: cells, step: step, markOffset: markOffset, bounds: bounds, formatter: formatter)
+        VerticalRuler(cells: cells,
+                      step: step,
+                      markOffset: markOffset,
+                      bounds: bounds,
+                      formatter: formatter)
           .equatable()
           .animation(nil)
           .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
@@ -184,6 +188,7 @@ struct VerticalSlidingUsage: View {
                            tick: .none)
       Text("\(value)")
     }
+    .environment(\.slidingRulerStyle, SlidingRulerStyleEnvironmentKey.verticalStyle)
   }
 }
 
