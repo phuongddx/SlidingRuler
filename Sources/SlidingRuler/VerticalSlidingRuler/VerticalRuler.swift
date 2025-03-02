@@ -35,6 +35,7 @@ struct VerticalRuler_Previews: PreviewProvider {
   static var previews: some View {
     VerticalRuler(cells: [.init(CGFloat(0)), .init(CGFloat(0))],
                   step: 1.0, markOffset: 0, bounds: -1 ... 1, formatter: nil)
+    .environment(\.slidingRulerStyle, SlidingRulerStyleEnvironmentKey.verticalStyle)
 //    VerticalSlidingUsage()
   }
 }

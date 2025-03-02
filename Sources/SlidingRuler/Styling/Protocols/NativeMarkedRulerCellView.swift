@@ -60,7 +60,7 @@ extension VerticalNativeMarkedRulerCellView {
   var displayMark: String { numberFormatter?.string(for: mark) ?? "\(mark.approximated())" }
   
   var body: some View {
-    HStack {
+    HStack(spacing: 0) {
       cell.equatable()
       Text(verbatim: displayMark)
         .font(Font.footnote.monospacedDigit())

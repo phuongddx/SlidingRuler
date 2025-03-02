@@ -29,7 +29,16 @@
 import SwiftUI
 
 public struct NativeCursorBody: View {
+  @Environment(\.slidingRulerStyle) private var style
+
   let color: Color
+  var width: CGFloat {
+    style.direction == .horizontal ? 3 : 30
+  }
+
+  var height: CGFloat {
+    style.direction == .vertical ? 3 : 30
+  }
 
   init(color: Color = .green) {
     self.color = color
@@ -38,7 +47,7 @@ public struct NativeCursorBody: View {
   public var body: some View {
     Capsule()
       .foregroundColor(color)
-      .frame(width: UIScreen.main.scale == 3 ? 3 : 3.5, height: 30)
+      .frame(width: width, height: height)
   }
 }
 

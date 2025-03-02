@@ -118,15 +118,18 @@ public struct VerticalSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stri
 
     return FlexibleWidthContainer {
       ZStack(alignment: .init(horizontal: .center, vertical: verticalCursorAlignment)) {
-        VerticalRuler(cells: cells,
-                      step: step,
-                      markOffset: markOffset,
-                      bounds: bounds,
-                      formatter: formatter)
+        HStack {
+          VerticalRuler(cells: cells,
+                        step: step,
+                        markOffset: markOffset,
+                        bounds: bounds,
+                        formatter: formatter)
           .equatable()
           .animation(nil)
-          .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
-        style.makeCursorBody()
+//          .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
+          .modifier(VerticalInfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
+          style.makeCursorBody()
+        }
       }
     }
     .modifier(InfiniteMarkOffsetModifier(renderedValue, step: step))
@@ -138,9 +141,9 @@ public struct VerticalSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stri
     .transaction {
       if $0.animation != nil { $0.animation = .easeIn(duration: 0.1) }
     }
-    .onHorizontalDragGesture(initialTouch: firstTouchHappened,
-                             prematureEnd: panGestureEndedPrematurely,
-                             perform: horizontalDragAction(withValue:))
+    .onVerticalDragGesture(initialTouch: firstTouchHappened,
+                           prematureEnd: panGestureEndedPrematurely,
+                           perform: verticalDragAction(withValue:))
   }
 
   func renderingValues() -> (CGFloat, CGSize) {
@@ -186,6 +189,7 @@ struct VerticalSlidingUsage: View {
                            step: 1,
                            snap: .none,
                            tick: .none)
+      .frame(width: 200)
       Text("\(value)")
     }
     .environment(\.slidingRulerStyle, SlidingRulerStyleEnvironmentKey.verticalStyle)

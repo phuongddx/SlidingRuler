@@ -37,7 +37,7 @@ enum StaticSlidingRulerStyleEnvironment {
 
 struct SlidingRulerStyleEnvironmentKey: EnvironmentKey {
   static var defaultValue: AnySlidingRulerStyle {
-    .init(style: PrimarySlidingRulerStyle()) }
+    .init(style: VerticalSlidingRulerStyle()) }
 
   static var verticalStyle: AnySlidingRulerStyle {
     .init(style: VerticalSlidingRulerStyle())

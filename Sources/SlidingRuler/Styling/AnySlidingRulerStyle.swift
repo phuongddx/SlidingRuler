@@ -42,7 +42,7 @@ struct AnySlidingRulerStyle: SlidingRulerStyle {
   let cellWidth: CGFloat
   let cursorAlignment: VerticalAlignment
   let hasMarks: Bool
-//  let direction: RulerDirection
+  let direction: RulerDirection
   
   init<T: SlidingRulerStyle> (style: T) {
     self.cellProvider = { (configuration: SlidingRulerStyleConfiguation) -> AnyFractionableView in
@@ -55,6 +55,7 @@ struct AnySlidingRulerStyle: SlidingRulerStyle {
     self.cellWidth = style.cellWidth
     self.cursorAlignment = style.cursorAlignment
     self.hasMarks = style.hasMarks
+    self.direction = style.direction
   }
   
   func makeCellBody(configuration: SlidingRulerStyleConfiguation) -> some FractionableView {

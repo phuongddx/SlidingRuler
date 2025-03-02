@@ -60,8 +60,8 @@ struct DefaultStyle_Previews: PreviewProvider {
   }
   
   static var previews: some View {
-    //        CellTrio(range: -0.4...0.9, width: 120)
-    //            .previewLayout(.sizeThatFits)
+    CellTrio(range: 11...17, width: 80)
+      .previewLayout(.sizeThatFits)
     VerticalSlidingUsage()
   }
 }
