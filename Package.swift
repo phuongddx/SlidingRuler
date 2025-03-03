@@ -7,10 +7,7 @@ let package = Package(
     products: [
         .library(
             name: "SlidingRuler",
-            targets: ["SlidingRuler"]),
-        .executable(
-            name: "SlidingRulerExample",
-            targets: ["SlidingRulerExample"])
+            targets: ["SlidingRuler"])
     ],
     dependencies: [
         .package(url: "https://github.com/Pyroh/SmoothOperators.git", .upToNextMajor(from: "0.4.0")),
@@ -19,13 +16,6 @@ let package = Package(
     targets: [
         .target(
             name: "SlidingRuler",
-            dependencies: ["SmoothOperators", "CoreGeometry"]),
-        .executableTarget(
-            name: "SlidingRulerExample",
-            dependencies: ["SlidingRuler"],
-            path: "Example"),
-        .testTarget(
-            name: "SlidingRulerTests",
-            dependencies: ["SlidingRuler"])
+            dependencies: ["SmoothOperators", "CoreGeometry"])
     ]
 )

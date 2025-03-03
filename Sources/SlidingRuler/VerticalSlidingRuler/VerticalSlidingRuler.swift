@@ -124,10 +124,10 @@ public struct VerticalSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stri
                         markOffset: markOffset,
                         bounds: bounds,
                         formatter: formatter)
-          .equatable()
-          .animation(nil)
+            .equatable()
+            .animation(nil)
 //          .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
-          .modifier(VerticalInfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
+            .modifier(VerticalInfiniteOffsetEffect(offset: renderedOffset, maxOffset: cellWidthOverflow))
           style.makeCursorBody()
         }
       }
@@ -189,7 +189,7 @@ struct VerticalSlidingUsage: View {
                            step: 1,
                            snap: .none,
                            tick: .none)
-      .frame(width: 200)
+        .frame(width: 200)
       Text("\(value)")
     }
     .environment(\.slidingRulerStyle, SlidingRulerStyleEnvironmentKey.verticalStyle)
