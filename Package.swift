@@ -1,6 +1,4 @@
 // swift-tools-version:5.10
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
 import PackageDescription
 
 let package = Package(
@@ -10,6 +8,9 @@ let package = Package(
         .library(
             name: "SlidingRuler",
             targets: ["SlidingRuler"]),
+        .executable(
+            name: "SlidingRulerExample",
+            targets: ["SlidingRulerExample"])
     ],
     dependencies: [
         .package(url: "https://github.com/Pyroh/SmoothOperators.git", .upToNextMajor(from: "0.4.0")),
@@ -18,6 +19,13 @@ let package = Package(
     targets: [
         .target(
             name: "SlidingRuler",
-            dependencies: ["SmoothOperators", "CoreGeometry"])
+            dependencies: ["SmoothOperators", "CoreGeometry"]),
+        .executableTarget(
+            name: "SlidingRulerExample",
+            dependencies: ["SlidingRuler"],
+            path: "Example"),
+        .testTarget(
+            name: "SlidingRulerTests",
+            dependencies: ["SlidingRuler"])
     ]
 )

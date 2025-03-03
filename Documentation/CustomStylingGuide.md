@@ -1,3 +1,0 @@
-# Custom Styling Guide
-
-WIP
