@@ -11,6 +11,10 @@ struct SlidingRulerStyleEnvironmentKey: EnvironmentKey {
     .init(style: VerticalSlidingRulerStyle())
   }
 
+  static var horizontalStyle: AnySlidingRulerStyle {
+    .init(style: PrimarySlidingRulerStyle())
+  }
+
   static var verticalStyle: AnySlidingRulerStyle {
     .init(style: VerticalSlidingRulerStyle())
   }

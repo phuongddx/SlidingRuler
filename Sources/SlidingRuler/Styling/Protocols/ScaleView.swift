@@ -21,6 +21,7 @@ extension ScaleView {
     shape
       .frame(size: .init(width: width, height: height))
       .fixedSize()
+      .background(Color.gray.opacity(0.2))
   }
 
   var unitMarkOffset: CGFloat { 0 }

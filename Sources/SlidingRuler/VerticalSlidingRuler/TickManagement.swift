@@ -10,11 +10,11 @@ extension VerticalSlidingRuler {
   }
 
   func tickIfNeeded(_ offset0: CGSize, _ offset1: CGSize) {
-    let width0 = offset0.width, width1 = offset1.width
+    let height0 = offset0.height, height1 = offset1.height
 
     let dragBounds = dragBounds
-    guard dragBounds.contains(width0), dragBounds.contains(width1),
-          !width0.isBound(of: dragBounds), !width1.isBound(of: dragBounds) else { return }
+    guard dragBounds.contains(height0), dragBounds.contains(height1),
+          !height0.isBound(of: dragBounds), !height1.isBound(of: dragBounds) else { return }
 
     let t: CGFloat
     switch tick {
@@ -24,10 +24,9 @@ extension VerticalSlidingRuler {
     case .none: return
     }
 
-    if width1 == 0 ||
-      (width0 < 0) != (width1 < 0) ||
-      Int((width0 / t).approximated()) != Int((width1 / t).approximated())
-    {
+    if height1 == 0 ||
+      (height0 < 0) != (height1 < 0) ||
+      Int((height0 / t).approximated()) != Int((height1 / t).approximated()) {
       valueTick()
     }
   }
@@ -36,4 +35,8 @@ extension VerticalSlidingRuler {
     let fg = UIImpactFeedbackGenerator(style: .light)
     fg.impactOccurred(intensity: 0.5)
   }
+}
+
+#Preview {
+  VerticalSlidingUsage()
 }

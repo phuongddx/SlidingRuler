@@ -2,9 +2,16 @@ import SwiftUI
 
 struct DefaultVerticalScaleView: ScaleView {
   struct VerticalScaleShape: Shape {
-    fileprivate var unitMarkSize: CGSize { .init(width: 27.0, height: 3.0) } // Swapped width/height for vertical
-    fileprivate var halfMarkSize: CGSize { .init(width: 19.0, height: UIScreen.main.scale == 3 ? 1.8 : 2.0) }
-    fileprivate var fractionMarkSize: CGSize { .init(width: 11.0, height: 1.0) }
+    fileprivate var unitMarkSize: CGSize {
+      .init(width: 27.0, height: 3.0)
+    } // Swapped width/height for vertical
+    fileprivate var halfMarkSize: CGSize {
+      .init(width: 19.0, height: UIScreen.main.scale == 3 ? 1.8 : 2.0)
+    }
+
+    fileprivate var fractionMarkSize: CGSize {
+      .init(width: 11.0, height: 1.0)
+    }
 
     func path(in rect: CGRect) -> Path {
       let centerY = rect.center.y
@@ -36,7 +43,10 @@ struct DefaultVerticalScaleView: ScaleView {
     }
   }
 
-  var shape: VerticalScaleShape { .init() }
+  var shape: VerticalScaleShape {
+    .init()
+  }
+
   let width: CGFloat
   let height: CGFloat
 
@@ -47,16 +57,6 @@ struct DefaultVerticalScaleView: ScaleView {
   init(width: CGFloat = 30, height: CGFloat) {
     self.width = width
     self.height = height
-  }
-}
-
-struct VerticalScaleView_Previews: PreviewProvider {
-  static var previews: some View {
-    Group {
-      DefaultVerticalScaleView(height: 120)
-        .background(Color.gray)
-    }
-    .previewLayout(.sizeThatFits)
   }
 }
 

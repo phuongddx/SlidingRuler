@@ -18,7 +18,7 @@ public struct VerticalSlidingRulerStyle: SlidingRulerStyle {
   }
 
   public func makeCursorBody() -> some View {
-    NativeCursorBody(color: .blue)
+      NativeCursorBody(color: .red)
   }
 }
 

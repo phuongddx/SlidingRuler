@@ -15,7 +15,6 @@ struct Ruler: View, Equatable {
         style.makeCellBody(configuration: configuration(forCell: cell))
       }
     }
-    .animation(nil)
   }
 
   private func configuration(forCell cell: RulerCell) -> SlidingRulerStyleConfiguation {
@@ -32,6 +31,6 @@ struct Ruler: View, Equatable {
 struct Ruler_Previews: PreviewProvider {
   static var previews: some View {
     Ruler(cells: [.init(CGFloat(0))],
-          step: 1.0, markOffset: 0, bounds: -1 ... 1, formatter: nil)
+          step: 1.0, markOffset: 11, bounds: 11 ... 17, formatter: nil)
   }
 }
