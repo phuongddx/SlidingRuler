@@ -12,6 +12,6 @@ public struct CenteredSlindingRulerStyle: SlidingRulerStyle {
   }
 
   public func makeCursorBody() -> some View {
-    NativeCursorBody()
+      NativeCursorBody()
   }
 }

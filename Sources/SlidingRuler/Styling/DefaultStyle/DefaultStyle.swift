@@ -23,16 +23,16 @@ struct DefaultStyle_Previews: PreviewProvider {
 
     var body: some View {
       HStack(spacing: 0) {
-        BlankCellBody(mark: -1, bounds: range, step: 1, cellWidth: width).clipped()
-        BlankCellBody(mark: 0, bounds: range, step: 1, cellWidth: width).clipped()
-        BlankCellBody(mark: 1, bounds: range, step: 1, cellWidth: width).clipped()
+          CenteredCellBody(mark: -1, bounds: range, step: 1, cellWidth: width).clipped()
+          CenteredCellBody(mark: 0, bounds: range, step: 1, cellWidth: width).clipped()
+          CenteredCellBody(mark: 1, bounds: range, step: 1, cellWidth: width).clipped()
       }
     }
   }
 
   static var previews: some View {
-    CellTrio(range: 11 ... 17, width: 80)
+    CellTrio(range: 11 ... 17, width: 120)
       .previewLayout(.sizeThatFits)
-    VerticalSlidingUsage()
+//    VerticalSlidingUsage()
   }
 }

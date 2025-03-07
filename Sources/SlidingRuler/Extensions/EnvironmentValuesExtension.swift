@@ -35,5 +35,3 @@ extension EnvironmentValues {
     set { self[SlideRulerCellOverflow.self] = newValue }
   }
 }
-
-#Preview { VerticalSlidingUsage() }

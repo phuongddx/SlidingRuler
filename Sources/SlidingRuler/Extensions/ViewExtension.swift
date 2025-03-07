@@ -43,3 +43,5 @@ extension View {
     )
   }
 }
+
+#Preview { HorizontalSlidingUsage() }

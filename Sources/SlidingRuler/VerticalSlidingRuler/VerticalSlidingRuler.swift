@@ -218,8 +218,7 @@ struct VerticalSlidingUsage: View {
 }
 
 struct HorizontalSlidingUsage: View {
-    @State private var value: Double = .zero
-    
+    @State private var value: Double = 14
     var body: some View {
         VStack {
             SlidingRuler(value: $value,
@@ -235,7 +234,5 @@ struct HorizontalSlidingUsage: View {
 }
 
 #Preview {
-    Group {
-        VerticalSlidingUsage()
-    }
+    HorizontalSlidingUsage()
 }
