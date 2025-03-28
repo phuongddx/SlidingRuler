@@ -29,7 +29,7 @@
 
 import Foundation
 
-extension BinaryFloatingPoint {
+public extension BinaryFloatingPoint {
     mutating func approximate() { self = approximated() }
     func approximated() -> Self { (self * 1_000_000).rounded() / 1_000_000 }
 

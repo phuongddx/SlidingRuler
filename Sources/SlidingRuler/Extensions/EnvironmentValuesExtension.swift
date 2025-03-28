@@ -29,23 +29,23 @@
 
 import SwiftUI
 
-enum StaticSlidingRulerStyleEnvironment {
-    @Environment(\.slidingRulerStyle.cellWidth) static var cellWidth
-    @Environment(\.slidingRulerStyle.cursorAlignment) static var alignment
-    @Environment(\.slidingRulerStyle.hasMarks) static var hasMarks
+public enum StaticSlidingRulerStyleEnvironment {
+    @Environment(\.slidingRulerStyle.cellWidth) public static var cellWidth
+    @Environment(\.slidingRulerStyle.cursorAlignment) public static var alignment
+    @Environment(\.slidingRulerStyle.hasMarks) public static var hasMarks
 }
 
-struct SlidingRulerStyleEnvironmentKey: EnvironmentKey {
-    static var defaultValue: AnySlidingRulerStyle {
+public struct SlidingRulerStyleEnvironmentKey: EnvironmentKey {
+    public static var defaultValue: AnySlidingRulerStyle {
         .init(style: PrimarySlidingRulerStyle())
     }
 }
 
-struct SlideRulerCellOverflow: EnvironmentKey {
-    static var defaultValue: Int { 3 }
+public struct SlideRulerCellOverflow: EnvironmentKey {
+    public static var defaultValue: Int { 3 }
 }
 
-extension EnvironmentValues {
+public extension EnvironmentValues {
     var slidingRulerStyle: AnySlidingRulerStyle {
         get { self[SlidingRulerStyleEnvironmentKey.self] }
         set { self[SlidingRulerStyleEnvironmentKey.self] = newValue }

@@ -29,16 +29,16 @@
 
 import SwiftUI
 
-struct AnySlidingRulerStyle: SlidingRulerStyle {
+public struct AnySlidingRulerStyle: SlidingRulerStyle {
     private let cellProvider: (SlidingRulerStyleConfiguation) -> AnyFractionableView
     private let cursorProvider: () -> AnyView
 
-    let fractions: Int
-    let cellWidth: CGFloat
-    let cursorAlignment: VerticalAlignment
-    let hasMarks: Bool
-    
-    init<T: SlidingRulerStyle> (style: T) {
+    public let fractions: Int
+    public let cellWidth: CGFloat
+    public let cursorAlignment: VerticalAlignment
+    public let hasMarks: Bool
+
+    public init<T: SlidingRulerStyle> (style: T) {
         self.cellProvider = { (configuration: SlidingRulerStyleConfiguation) -> AnyFractionableView in
             AnyFractionableView(style.makeCellBody(configuration: configuration))
         }
@@ -51,11 +51,11 @@ struct AnySlidingRulerStyle: SlidingRulerStyle {
         self.hasMarks = style.hasMarks
     }
     
-    func makeCellBody(configuration: SlidingRulerStyleConfiguation) -> some FractionableView {
+    public func makeCellBody(configuration: SlidingRulerStyleConfiguation) -> some FractionableView {
         cellProvider(configuration)
     }
     
-    func makeCursorBody() -> some View {
+    public func makeCursorBody() -> some View {
         cursorProvider()
     }
 }
