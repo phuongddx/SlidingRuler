@@ -1,36 +1,15 @@
 //
-//  SlidingRuler.swift
-//
+//  VSlidingRuler.swift
 //  SlidingRuler
 //
-//  MIT License
-//
-//  Copyright (c) 2020 Pierre Tacchi
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in all
-//  copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//  SOFTWARE.
+//  Created by Phuong Doan Duy on 27/3/25.
 //
 
 
 import SwiftUI
 import SmoothOperators
 
-public struct SlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: BinaryFloatingPoint {
+public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: BinaryFloatingPoint {
 
     @Environment(\.slidingRulerCellOverflow) private var cellOverflow
 
@@ -201,7 +180,7 @@ public struct SlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bina
 }
 
 // MARK: Drag Gesture Management
-extension SlidingRuler {
+extension VSlidingRuler {
 
     /// Callback handling first touch event.
     private func firstTouchHappened() {
@@ -284,7 +263,7 @@ extension SlidingRuler {
 }
 
 // MARK: Value Management
-extension SlidingRuler {
+extension VSlidingRuler {
 
     /// Compute the value from the given ruler's offset.
     private func value(fromOffset offset: CGSize) -> CGFloat {
@@ -360,7 +339,7 @@ extension SlidingRuler {
 }
 
 // MARK: Control Update
-extension SlidingRuler {
+extension VSlidingRuler {
 
     /// Adjusts the number of cells as the control size changes.
     private func updateCellsIfNeeded() {
@@ -376,12 +355,8 @@ extension SlidingRuler {
     }
 }
 
-extension UIScrollView.DecelerationRate {
-    static var ruler: Self { Self.init(rawValue: 0.9972) }
-}
-
 // MARK: Mechanic Simulation
-extension SlidingRuler {
+extension VSlidingRuler {
 
     private func applyInertia(initialVelocity: CGFloat) {
         func shiftOffset(by distance: CGSize) {
@@ -506,7 +481,7 @@ extension SlidingRuler {
 
 
 // MARK: Tick Management
-extension SlidingRuler {
+extension VSlidingRuler {
     private func boundaryMet() {
         let fg = UIImpactFeedbackGenerator(style: .rigid)
         fg.impactOccurred(intensity: 0.667)
@@ -539,4 +514,3 @@ extension SlidingRuler {
         fg.impactOccurred(intensity: 0.5)
     }
 }
-
