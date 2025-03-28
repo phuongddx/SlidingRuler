@@ -31,43 +31,73 @@ import SwiftUI
 
 struct DefaultScaleView: ScaleView {
     struct ScaleShape: Shape {
-        fileprivate var unitMarkSize: CGSize { .init(width: 3.0, height: 27.0)}
-        fileprivate var halfMarkSize: CGSize { .init(width: UIScreen.main.scale == 3 ? 1.8 : 2.0, height: 19.0) }
-        fileprivate var fractionMarkSize: CGSize { .init(width: 1.0, height: 11.0)}
+        fileprivate var unitMarkSize: CGSize {
+            .init(width: 3.0, height: 30)}
+        fileprivate var halfMarkSize: CGSize {
+            .init(width: UIScreen.main.scale == 3 ? 1.8 : 2.0, height: 19.0) }
+        fileprivate var fractionMarkSize: CGSize {
+            .init(width: 1.0, height: 15)}
         
         func path(in rect: CGRect) -> Path {
-            let centerX = rect.center.x
+            let centerX: Double = rect.center.x
             var p = Path()
             
-            p.addRoundedRect(in: unitRect(x: centerX), cornerSize: .init(square: unitMarkSize.width/2))
-            p.addRoundedRect(in: halfRect(x: 0), cornerSize: .init(square: halfMarkSize.width/2))
-            p.addRoundedRect(in: halfRect(x: rect.maxX), cornerSize: .init(square: halfMarkSize.width/2))
+            p.addRoundedRect(in: unitRect(x: centerX, y: rect.minY),
+                             cornerSize: .init(square: unitMarkSize.width/2))
+
+            p.addRoundedRect(in: halfRect(x: 0, y: rect.maxY - halfMarkSize.height),
+                             cornerSize: .init(square: halfMarkSize.width/2))
+
+            p.addRoundedRect(in: halfRect(x: rect.maxX, y: rect.maxY - halfMarkSize.height),
+                             cornerSize: .init(square: halfMarkSize.width/2))
             
             let tenth = rect.width / 10
+
             for i in 1...4 {
-                p.addRoundedRect(in: tenthRect(x: centerX + CGFloat(i) * tenth), cornerSize: .init(square: fractionMarkSize.width/2))
-                p.addRoundedRect(in: tenthRect(x: centerX - CGFloat(i) * tenth), cornerSize: .init(square: fractionMarkSize.width/2))
+                p.addRoundedRect(in: tenthRect(x: centerX + CGFloat(i) * tenth,
+                                               y: rect.maxY - fractionMarkSize.height),
+                                 cornerSize: .init(square: fractionMarkSize.width/2))
+                p.addRoundedRect(in: tenthRect(x: centerX - CGFloat(i) * tenth,
+                                               y: rect.maxY - fractionMarkSize.height),
+                                 cornerSize: .init(square: fractionMarkSize.width/2))
             }
             
             return p
         }
         
-        private func unitRect(x: CGFloat) -> CGRect { rect(centerX: x, size: unitMarkSize) }
-        private func halfRect(x: CGFloat) -> CGRect { rect(centerX: x, size: halfMarkSize) }
-        private func tenthRect(x: CGFloat) -> CGRect { rect(centerX: x, size: fractionMarkSize) }
+        private func unitRect(x: CGFloat, y: CGFloat = 0) -> CGRect {
+            rect(centerX: x, y: y, size: unitMarkSize)
+        }
+        
+        private func halfRect(x: CGFloat, y: CGFloat = 0) -> CGRect {
+            rect(centerX: x, y: y, size: halfMarkSize)
+        }
+        
+        private func tenthRect(x: CGFloat, y: CGFloat = 0) -> CGRect {
+            rect(centerX: x, y: y, size: fractionMarkSize)
+        }
         
         private func rect(centerX x: CGFloat, size: CGSize) -> CGRect {
             CGRect(origin: .init(x: x - size.width / 2, y: 0), size: size)
         }
+
+        private func rect(centerX x: CGFloat, y: CGFloat, size: CGSize) -> CGRect {
+            CGRect(origin: .init(x: x - size.width / 2, y: y), size: size)
+        }
     }
 
-    var shape: ScaleShape { .init() }
+    var shape: ScaleShape { ScaleShape() }
     let width: CGFloat
     let height: CGFloat
 
-    var unitMarkWidth: CGFloat { shape.unitMarkSize.width }
-    var halfMarkWidth: CGFloat { shape.halfMarkSize.width }
-    var fractionMarkWidth: CGFloat { shape.fractionMarkSize.width }
+    var unitMarkWidth: CGFloat {
+        shape.unitMarkSize.width }
+    
+    var halfMarkWidth: CGFloat {
+        shape.halfMarkSize.width }
+    
+    var fractionMarkWidth: CGFloat {
+        shape.fractionMarkSize.width }
 
     init(width: CGFloat, height: CGFloat = 30) {
         self.width = width
@@ -75,11 +105,21 @@ struct DefaultScaleView: ScaleView {
     }
 }
 
+extension CGSize {
+    var midWidth: Double {
+        Double(width / 2)
+    }
+
+    var midHeight: Double {
+        Double(height/2)
+    }
+}
+
 struct ScaleView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             DefaultScaleView(width: 120)
+                .background(Color.black.opacity(0.2))
         }
-        .previewLayout(.sizeThatFits)
     }
 }
