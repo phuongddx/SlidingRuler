@@ -8,6 +8,9 @@
 
 import SwiftUI
 import SmoothOperators
+#Preview {
+    VSlideRulerExample()
+}
 
 public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: BinaryFloatingPoint {
 
@@ -38,8 +41,9 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
 
     /// Width of the control, retrieved through preference key.
     @State private var controlWidth: CGFloat?
+
     /// Height of the ruller, retrieved through preference key.
-    @State private var rulerHeight: CGFloat?
+//    @State private var rulerHeight: CGFloat?
 
     /// Cells of the ruler.
     @State private var cells: [RulerCell] = [.init(CGFloat(0))]
@@ -76,7 +80,11 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
     /// Over-ranged drag rubber should be released.
     private var isRubberBandNeedingRelease: Bool { !dragBounds.contains(dragOffset.width) }
     /// Amount of units the ruler can translate in both direction before needing to refresh the cells and reset offset.
-    private var cellWidthOverflow: CGFloat { cellWidth * CGFloat(cellOverflow) }
+    private var cellWidthOverflow: CGFloat {
+        let result = cellWidth * CGFloat(cellOverflow)
+        print(result)
+        return result
+    }
     /// Current value clamped to the receiver's value bounds.
     private var clampedValue: CGFloat { value.clamped(to: bounds) }
 
@@ -118,28 +126,38 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
     }
 
     // MARK: Rendering
-    
+
     public var body: some View {
-        let renderedValue: CGFloat, renderedOffset: CGSize
+        let renderedValue: CGFloat
+        let renderedOffset: CGSize
 
         (renderedValue, renderedOffset) = renderingValues()
 
-        return FlexibleWidthContainer {
-            ZStack(alignment: .init(horizontal: .center, vertical: self.verticalCursorAlignment)) {
-                Ruler(cells: self.cells, step: self.step, markOffset: self.markOffset, bounds: self.bounds, formatter: self.formatter)
-                    .equatable()
-                    .modifier(InfiniteOffsetEffect(offset: renderedOffset, maxOffset: self.cellWidthOverflow))
+        return FlexibleHeightContainer {
+            ZStack(alignment: .init(horizontal: .center,
+                                    vertical: .center)) {
+                Ruler(cells: self.cells,
+                      step: self.step,
+                      markOffset: self.markOffset,
+                      bounds: self.bounds,
+                      formatter: self.formatter,
+                      direction: .vertical)
+                .equatable()
+                .modifier(VerticalInfiniteOffsetEffect(offset: renderedOffset,
+                                                       maxOffset: self.cellWidthOverflow))
                 self.style.makeCursorBody()
             }
         }
         .modifier(InfiniteMarkOffsetModifier(renderedValue, step: step))
-        .propagateWidth(ControlWidthPreferenceKey.self)
+        .propagateHeight(ControlWidthPreferenceKey.self)
         .onPreferenceChange(MarkOffsetPreferenceKey.self, storeValueIn: $markOffset)
         .onPreferenceChange(ControlWidthPreferenceKey.self, storeValueIn: $controlWidth) {
             self.updateCellsIfNeeded()
         }
         .transaction {
-            if $0.animation != nil { $0.animation = .easeIn(duration: 0.1) }
+            if $0.animation != nil {
+                $0.animation = .easeIn(duration: 0.1)
+            }
         }
         .onHorizontalDragGesture(initialTouch: firstTouchHappened,
                                  prematureEnd: panGestureEndedPrematurely,
@@ -273,7 +291,7 @@ extension VSlidingRuler {
     /// Compute the ruler's offset from the given value.
     private func offset(fromValue value: CGFloat) -> CGSize {
         let width = -value * cellWidth / step
-        return self.directionalOffset(.init(horizontal: width))
+        return self.directionalOffset(.init(vertical: width))
     }
 
     /// Sets the value.
@@ -328,13 +346,17 @@ extension VSlidingRuler {
 
     ///  Transforms any numerical value based the layout direction. /!\ not properly tested.
     func directionalValue<T: Numeric>(_ value: T) -> T {
-        value * (layoutDirection == .rightToLeft ? -1 : 1)
+        value * (layoutDirection != .rightToLeft ? -1 : 1)
     }
 
     /// Transforms an offsetr based on the layout direction. /!\ not properly tested.
     func directionalOffset(_ offset: CGSize) -> CGSize {
-        let width = self.directionalValue(offset.width)
-        return .init(width: width, height: offset.height)
+        // Horizontal
+//        let width = self.directionalValue(offset.width)
+//        return .init(width: width, height: offset.height)
+        // Vertical\
+        let height = self.directionalValue(offset.height)
+        return .init(width: offset.width, height: height)
     }
 }
 
@@ -344,6 +366,7 @@ extension VSlidingRuler {
     /// Adjusts the number of cells as the control size changes.
     private func updateCellsIfNeeded() {
         guard let controlWidth = controlWidth else { return }
+        print("cellWidth", cellWidth, cellOverflow)
         let count = (Int(ceil(controlWidth / cellWidth)) + cellOverflow * 2).nextOdd()
         if count != cells.count { self.populateCells(count: count) }
     }

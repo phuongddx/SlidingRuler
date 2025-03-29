@@ -37,7 +37,9 @@ struct InfiniteMarkOffsetModifier: AnimatableModifier {
     
     var offset: CGFloat {
         let overflow = CGFloat(self.overflow)
-        return (value / step / overflow).approximated().rounded(.towardZero) * overflow
+        return (value / step / overflow)
+            .approximated()
+            .rounded(.towardZero) * overflow
     }
     
     var animatableData: CGFloat {

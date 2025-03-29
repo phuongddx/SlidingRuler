@@ -29,6 +29,11 @@
 
 import SwiftUI
 
+enum RulerDirection {
+    case vertical
+    case horizontal
+}
+
 struct Ruler: View, Equatable {
     @Environment(\.slidingRulerStyle) private var style
     
@@ -37,11 +42,39 @@ struct Ruler: View, Equatable {
     let markOffset: CGFloat
     let bounds: ClosedRange<CGFloat>
     let formatter: NumberFormatter?
-    
+    let direction: RulerDirection
+
+    init(
+        cells: [RulerCell],
+        step: CGFloat,
+        markOffset: CGFloat,
+        bounds: ClosedRange<CGFloat>,
+        formatter: NumberFormatter? = nil,
+        direction: RulerDirection = .horizontal
+    ) {
+        self.cells = cells
+        self.step = step
+        self.markOffset = markOffset
+        self.bounds = bounds
+        self.formatter = formatter
+        self.direction = direction
+    }
+
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(self.cells) { cell in
-                self.style.makeCellBody(configuration: self.configuration(forCell: cell))
+        Group {
+            switch direction {
+                case .vertical:
+                    VStack(spacing: 0) {
+                        ForEach(self.cells) { cell in
+                            self.style.makeCellBody(configuration: self.configuration(forCell: cell))
+                        }
+                    }
+                case .horizontal:
+                    HStack(spacing: 0) {
+                        ForEach(self.cells) { cell in
+                            self.style.makeCellBody(configuration: self.configuration(forCell: cell))
+                        }
+                    }
             }
         }
     }
@@ -59,7 +92,14 @@ struct Ruler: View, Equatable {
 
 struct Ruler_Previews: PreviewProvider {
     static var previews: some View {
-        Ruler(cells: [.init(CGFloat(0))],
-              step: 1.0, markOffset: 0, bounds: -1...1, formatter: nil)
+        Ruler(cells: RulerCell.mockedList,
+              step: 1.0, markOffset: 0, bounds: -1...1, direction: .vertical)
     }
+}
+
+extension RulerCell {
+    static var mockedList: [RulerCell] = [
+        RulerCell(0),
+        RulerCell(2),
+    ]
 }

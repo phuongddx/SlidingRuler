@@ -53,3 +53,28 @@ struct FlexibleWidthContainer<Content: View>: View {
             .clipped()
     }
 }
+
+private struct _FlexibleHeightContainerWidthPreference: PreferenceKey {
+    static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
+        if let newValue = nextValue() {
+            value = newValue
+        }
+    }
+}
+
+struct FlexibleHeightContainer<Content: View>: View {
+    @State private var width: CGFloat?
+    private let content: Content
+
+    init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        Color.red.opacity(0.2)
+            .frame(width: width)
+            .overlay(content.propagateWidth(_FlexibleHeightContainerWidthPreference.self))
+            .onPreferenceChange(_FlexibleHeightContainerWidthPreference.self, storeValueIn: $width)
+            .clipped()
+    }
+}
