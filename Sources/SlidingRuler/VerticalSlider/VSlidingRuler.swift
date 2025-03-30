@@ -22,8 +22,6 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
     @Environment(\.slidingRulerStyle.fractions) private var fractions
     @Environment(\.slidingRulerStyle.hasHalf) private var hasHalf
 
-    @Environment(\.layoutDirection) private var layoutDirection
-
     /// Bound value.
     @Binding private var controlValue: V
     /// Possible value range.
@@ -41,9 +39,6 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
 
     /// Width of the control, retrieved through preference key.
     @State private var controlWidth: CGFloat?
-
-    /// Height of the ruller, retrieved through preference key.
-//    @State private var rulerHeight: CGFloat?
 
     /// Cells of the ruler.
     @State private var cells: [RulerCell] = [.init(CGFloat(0))]
@@ -80,13 +75,11 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
     /// Over-ranged drag rubber should be released.
     private var isRubberBandNeedingRelease: Bool {
         let bool = !dragBounds.contains(dragOffset.height)
-        print("isRubberBandNeedingRelease")
         return bool
     }
     /// Amount of units the ruler can translate in both direction before needing to refresh the cells and reset offset.
     private var cellWidthOverflow: CGFloat {
         let result = cellWidth * CGFloat(cellOverflow)
-        print(result)
         return result
     }
     /// Current value clamped to the receiver's value bounds.
@@ -166,6 +159,7 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
         .onVerticalDragGesture(initialTouch: firstTouchHappened,
                                prematureEnd: panGestureEndedPrematurely,
                                perform: horizontalDragAction(withValue:))
+        .frame(height: CGFloat(cellWidth * CGFloat(self.cells.count)))
     }
 
     private func renderingValues() -> (CGFloat, CGSize) {
@@ -252,10 +246,10 @@ extension VSlidingRuler {
 
     /// Callback handling horizontal drag gesture updating.
     private func horizontalDragChanged(_ value: VerticalDragGestureValue) {
-        let newOffset = self.directionalOffset(CGSize(width: 0,
-                                                      height: value.translation.height + referenceOffset.height))
+        let newOffset = CGSize(width: 0,
+                               height: value.translation.height + referenceOffset.height)
         let newValue = self.value(fromOffset: newOffset)
-        
+
         self.tickIfNeeded(dragOffset, newOffset)
         
         withoutAnimation {
@@ -270,7 +264,7 @@ extension VSlidingRuler {
             self.releaseRubberBand()
             self.endDragSession()
         } else if abs(value.velocity) > 90 {
-            self.applyInertia(initialVelocity: value.velocity)
+//            self.applyInertia(initialVelocity: value.velocity)
         } else {
             state = .idle
             self.endDragSession()
@@ -290,13 +284,13 @@ extension VSlidingRuler {
 
     /// Compute the value from the given ruler's offset.
     private func value(fromOffset offset: CGSize) -> CGFloat {
-        self.directionalValue(-CGFloat(offset.width / cellWidth) * step)
+        return -CGFloat(offset.width / cellWidth) * step
     }
 
     /// Compute the ruler's offset from the given value.
     private func offset(fromValue value: CGFloat) -> CGSize {
         let width = -value * cellWidth / step
-        return self.directionalOffset(.init(vertical: width))
+        return CGSize(vertical: width)
     }
 
     /// Sets the value.
@@ -348,22 +342,6 @@ extension VSlidingRuler {
 
         return deltaDown < deltaUp ? lower : upper
     }
-
-    ///  Transforms any numerical value based the layout direction. /!\ not properly tested.
-    func directionalValue<T: Numeric>(_ value: T) -> T {
-        value * (layoutDirection == .rightToLeft ? -1 : 1)
-//        value
-    }
-
-    /// Transforms an offsetr based on the layout direction. /!\ not properly tested.
-    func directionalOffset(_ offset: CGSize) -> CGSize {
-        // Horizontal
-//        let width = self.directionalValue(offset.width)
-//        return .init(width: width, height: offset.height)
-        // Vertical\
-        let height = self.directionalValue(offset.height)
-        return .init(width: offset.width, height: height)
-    }
 }
 
 // MARK: Control Update
@@ -371,10 +349,13 @@ extension VSlidingRuler {
 
     /// Adjusts the number of cells as the control size changes.
     private func updateCellsIfNeeded() {
-        guard let controlWidth = controlWidth else { return }
-        print("cellWidth", cellWidth, cellOverflow)
+        guard let controlWidth = controlWidth else {
+            return
+        }
         let count = (Int(ceil(controlWidth / cellWidth)) + cellOverflow * 2).nextOdd()
-        if count != cells.count { self.populateCells(count: count) }
+        if count != cells.count {
+            self.populateCells(count: count)
+        }
     }
 
     /// Creates `count` cells for the ruler.
@@ -386,79 +367,6 @@ extension VSlidingRuler {
 
 // MARK: Mechanic Simulation
 extension VSlidingRuler {
-
-    private func applyInertia(initialVelocity: CGFloat) {
-        func shiftOffset(by distance: CGSize) {
-            let newOffset = directionalOffset(self.referenceOffset + distance)
-            let newValue = self.value(fromOffset: newOffset)
-
-            self.tickIfNeeded(self.dragOffset, newOffset)
-
-            withoutAnimation {
-                self.setValue(newValue)
-                self.dragOffset = newOffset
-            }
-        }
-
-        referenceOffset = dragOffset
-
-        let rate = UIScrollView.DecelerationRate.ruler
-        let totalDistance = Mechanic.Inertia.totalDistance(forVelocity: initialVelocity, decelerationRate: rate)
-        let finalOffset = self.referenceOffset + .init(vertical: totalDistance)
-
-        state = .flicking
-
-        if dragBounds.contains(finalOffset.width) {
-            let duration = Mechanic.Inertia.duration(forVelocity: initialVelocity, decelerationRate: rate)
-
-            animationTimer = .init(duration: duration, animations: { (progress, interval) in
-                let distance =  CGSize(horizontal: Mechanic.Inertia.distance(atTime: progress, v0: initialVelocity, decelerationRate: rate))
-                shiftOffset(by: distance)
-            }, completion: { (completed) in
-                if completed {
-                    self.state = .idle
-                    shiftOffset(by: .init(vertical: totalDistance))
-                    self.snapIfNeeded()
-                    self.endDragSession()
-                } else {
-                    NextLoop { self.endDragSession() }
-                }
-            })
-        } else {
-            let allowedDistance = finalOffset.width.clamped(to: dragBounds) - self.referenceOffset.width
-            let duration = Mechanic.Inertia.time(toReachDistance: allowedDistance, forVelocity: initialVelocity, decelerationRate: rate)
-            animationTimer = .init(duration: duration, animations: { (progress, interval) in
-                let distance =  CGSize(horizontal: Mechanic.Inertia.distance(atTime: progress, v0: initialVelocity, decelerationRate: rate))
-                shiftOffset(by: distance)
-            }, completion: { (completed) in
-                if completed {
-                    shiftOffset(by: .init(vertical: allowedDistance))
-                    let remainingVelocity = Mechanic.Inertia.velocity(atTime: duration, v0: initialVelocity, decelerationRate: rate)
-                    self.applyInertialRubber(remainingVelocity: remainingVelocity)
-                    self.endDragSession()
-                } else {
-                    NextLoop { self.endDragSession() }
-                }
-            })
-        }
-    }
-
-    private func applyInertialRubber(remainingVelocity: CGFloat) {
-        let duration = Mechanic.Spring.duration(forVelocity: abs(remainingVelocity), displacement: 0)
-        let targetOffset = dragOffset.width.nearestBound(of: dragBounds)
-
-        state = .springing
-
-        animationTimer = .init(duration: duration, animations: { (progress, interval) in
-            let delta = Mechanic.Spring.value(atTime: progress, v0: remainingVelocity, displacement: 0)
-            self.dragOffset = .init(vertical: targetOffset + delta)
-        }, completion: { (completed) in
-            if completed {
-                self.dragOffset = .init(vertical: targetOffset)
-                self.state = .idle
-            }
-        })
-    }
 
     /// Applies rubber effect to an off-range offset.
     private func applyRubber(to offset: CGSize) -> CGSize {
@@ -517,19 +425,26 @@ extension VSlidingRuler {
     }
 
     private func tickIfNeeded(_ offset0: CGSize, _ offset1: CGSize) {
-        print("tickIfNeeded")
-        let width0 = offset0.height, width1 = offset1.height
+        let width0 = offset0.height,
+            width1 = offset1.height
 
         let dragBounds = self.dragBounds
-        guard dragBounds.contains(width0), dragBounds.contains(width1),
-            !width0.isBound(of: dragBounds), !width1.isBound(of: dragBounds) else { return }
-        
+        guard dragBounds.contains(width0),
+              dragBounds.contains(width1),
+              !width0.isBound(of: dragBounds),
+              !width1.isBound(of: dragBounds)
+        else { return }
+
         let t: CGFloat
         switch tick {
-        case .unit: t = cellWidth
-        case .half: t = hasHalf ? cellWidth / 2 : cellWidth
-        case .fraction: t = cellWidth / CGFloat(fractions)
-        case .none: return
+            case .unit:
+                t = cellWidth
+            case .half:
+                t = hasHalf ? cellWidth / 2 : cellWidth
+            case .fraction:
+                t = cellWidth / CGFloat(fractions)
+            case .none:
+                return
         }
         
         if width1 == 0 ||
