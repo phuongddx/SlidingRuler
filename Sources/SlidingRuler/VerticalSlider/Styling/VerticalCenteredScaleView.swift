@@ -73,7 +73,7 @@ struct VerticalCenteredScaleView: ScaleView {
     }
 }
 
-protocol VerticalNativeMarkedRulerCellView: MarkedRulerCellView { }
+protocol VerticalNativeMarkedRulerCellView: VerticalMarkedRulerCellView { }
 
 extension VerticalNativeMarkedRulerCellView {
     var markColor: Color {
@@ -99,11 +99,15 @@ struct DefaultVerticalCenteredCellBody: VerticalNativeMarkedRulerCellView {
     var mark: CGFloat
     var bounds: ClosedRange<CGFloat>
     var step: CGFloat
-    var cellWidth: CGFloat
+    var cellHeight: CGFloat
     var numberFormatter: NumberFormatter?
     
-    var cell: some RulerCellView {
-        VerticalCenteredCellBody(mark: mark, bounds: bounds, step: step, cellWidth: cellWidth)
+    var cell: some VerticalRulerCellView {
+        VerticalCenteredCellBody(
+            mark: mark,
+            bounds: bounds,
+            step: step,
+            cellHeight: cellHeight)
     }
 }
 
@@ -111,10 +115,10 @@ struct VerticalCenteredCellBody: VerticalNativeRulerCellView {
     var mark: CGFloat
     var bounds: ClosedRange<CGFloat>
     var step: CGFloat
-    var cellWidth: CGFloat
+    var cellHeight: CGFloat
     
     var scale: some ScaleView {
-        VerticalCenteredScaleView(height: cellWidth)
+        VerticalCenteredScaleView(height: cellHeight)
     }
 }
 
@@ -132,7 +136,7 @@ public struct VerticalCenteredStyle: SlidingRulerStyle {
         DefaultVerticalCenteredCellBody(mark: configuration.mark,
                                         bounds: configuration.bounds,
                                         step: configuration.step,
-                                        cellWidth: cellWidth,
+                                        cellHeight: cellWidth,
                                         numberFormatter: configuration.formatter)
     }
     

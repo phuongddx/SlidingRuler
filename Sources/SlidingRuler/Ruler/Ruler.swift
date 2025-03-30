@@ -93,13 +93,18 @@ struct Ruler: View, Equatable {
 struct Ruler_Previews: PreviewProvider {
     static var previews: some View {
         Ruler(cells: RulerCell.mockedList,
-              step: 1.0, markOffset: 0, bounds: -1...1, direction: .vertical)
+              step: 1.0,
+              markOffset: 0,
+              bounds: 11...17,
+              direction: .vertical)
+        .environment(\.slidingRulerStyle,
+                      AnySlidingRulerStyle(style: VerticalCenteredStyle()))
     }
 }
 
 extension RulerCell {
     static var mockedList: [RulerCell] = [
-        RulerCell(0),
-        RulerCell(2),
+        RulerCell(12),
+        RulerCell(14),
     ]
 }

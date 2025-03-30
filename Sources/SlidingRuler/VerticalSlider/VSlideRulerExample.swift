@@ -21,6 +21,7 @@ struct VSlideRulerExample: View {
     
     var body: some View {
         VStack {
+            Text("Value:\(value)")
             VSlidingRuler(value: $value,
                           in: closedRange,
                           step: 1,
@@ -37,10 +38,11 @@ struct HSlideRulerExample: View {
     @State var value: Double = 15
     @Environment(\.slidingRulerStyle.cursorAlignment) var cursorAlignment
     
-    let closedRange: ClosedRange<Double> = 1...10
+    let closedRange: ClosedRange<Double> = 11...17
     
     var body: some View {
-        HStack {
+        VStack(spacing: 16) {
+            Text("Value: \(value)")
             SlidingRuler(value: $value,
                           in: closedRange,
                           step: 1,
@@ -52,6 +54,10 @@ struct HSlideRulerExample: View {
 }
 
 #Preview {
-//    VSlideRulerExample()
     HSlideRulerExample()
+        .previewDisplayName("1231")
+}
+
+#Preview {
+    VSlideRulerExample()
 }

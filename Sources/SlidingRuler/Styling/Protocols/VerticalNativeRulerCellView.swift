@@ -8,27 +8,33 @@
 import SwiftUI
 import SmoothOperators
 
-protocol VerticalNativeRulerCellView: RulerCellView { }
+protocol VerticalNativeRulerCellView: VerticalRulerCellView { }
 
 extension VerticalNativeRulerCellView {
     var maskShape: some Shape {
-        guard !isComplete else { return ScaleMask(originX: .zero, width: cellWidth) }
+        guard !isComplete else {
+            return ScaleMask(originX: .zero, width: cellHeight)
+        }
         guard cellBounds.overlaps(bounds) else { return ScaleMask.zero }
         
         let availableRange = bounds.clamped(to: cellBounds)
         
-        let leadingOffset: CGFloat = adjustOffset(abs(CGFloat((availableRange.lowerBound - cellBounds.lowerBound) / step) * cellWidth).approximated())
-        let trailingOffset: CGFloat = adjustOffset(abs(CGFloat((cellBounds.upperBound - availableRange.upperBound) / step) * cellWidth).approximated())
+        let leadingOffset: CGFloat = adjustOffset(
+            abs(CGFloat((availableRange.lowerBound - cellBounds.lowerBound) / step) * cellHeight).approximated()
+        )
+        let trailingOffset: CGFloat = adjustOffset(
+            abs(CGFloat((cellBounds.upperBound - availableRange.upperBound) / step) * cellHeight).approximated()
+        )
         
         // For vertical ruler, we use width as height (keeping variable names)
-        let maskWidth = cellWidth - (leadingOffset + trailingOffset)
+        let maskWidth = cellHeight - (leadingOffset + trailingOffset)
         
         return ScaleMask(originX: leadingOffset, width: maskWidth)
     }
     
     private var hasHalf: Bool { Scale.hasHalf }
     private var fractions: Int { Self.fractions }
-    private var fractionWidth: CGFloat { cellWidth / CGFloat(fractions) }
+    private var fractionWidth: CGFloat { cellHeight / CGFloat(fractions) }
 
     private func areaLimits(_ area: Int) -> (leading: CGFloat, trailing: CGFloat) {
         let leadingLimit: CGFloat
@@ -53,7 +59,7 @@ extension VerticalNativeRulerCellView {
             else if Scale.hasHalf && area == (fractions / 2) { leadingLimit = CGFloat(area) * fractionWidth + scale.halfMarkWidth / 2 }
             else { leadingLimit = CGFloat(area) * fractionWidth + fractionWidth / 2 }
             
-            if area == fractions - 1 { trailingLimit = cellWidth - scale.unitMarkWidth / 2 }
+            if area == fractions - 1 { trailingLimit = cellHeight - scale.unitMarkWidth / 2 }
             else if Scale.hasHalf && area == (fractions / 2 - 1) { trailingLimit = CGFloat(area + 1) * fractionWidth + scale.halfMarkWidth / 2 }
             else { trailingLimit = CGFloat(area + 1) * fractionWidth - fractionWidth / 2 }
         }

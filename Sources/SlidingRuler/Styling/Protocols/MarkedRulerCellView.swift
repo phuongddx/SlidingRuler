@@ -45,3 +45,20 @@ public protocol MarkedRulerCellView: FractionableView {
 extension MarkedRulerCellView {
     static var fractions: Int { CellView.fractions }
 }
+
+public protocol VerticalMarkedRulerCellView: FractionableView {
+    associatedtype CellView: VerticalRulerCellView
+    
+    var mark: CGFloat { get }
+    var bounds: ClosedRange<CGFloat> { get }
+    var step: CGFloat { get }
+    var cellHeight: CGFloat { get }
+    
+    var numberFormatter: NumberFormatter? { get }
+    var markColor: Color { get }
+    var cell: CellView { get }
+}
+
+extension VerticalMarkedRulerCellView {
+    static var fractions: Int { CellView.fractions }
+}

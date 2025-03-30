@@ -54,8 +54,8 @@ struct VerticalInfiniteOffsetEffect: GeometryEffect {
     let maxOffset: CGFloat
 
     var correctedOffset: CGSize {
-        let tx = offset.width.truncatingRemainder(dividingBy: maxOffset)
-        return .init(horizontal: tx)
+        let ty = offset.height.truncatingRemainder(dividingBy: maxOffset)
+        return .init(vertical: ty)
     }
     
     var animatableData: CGSize.AnimatableData {
@@ -66,7 +66,8 @@ struct VerticalInfiniteOffsetEffect: GeometryEffect {
     func effectValue(size: CGSize) -> ProjectionTransform {
         assert(!size.width.isNaN && !size.height.isNaN)
         return ProjectionTransform(
-            CGAffineTransform(translationX: correctedOffset.width, y: correctedOffset.height))
+            CGAffineTransform(translationX: correctedOffset.width,
+                              y: correctedOffset.height))
     }
 }
 

@@ -69,3 +69,44 @@ extension RulerCellView {
         lhs.isComplete && rhs.isComplete
     }
 }
+
+public protocol VerticalRulerCellView: FractionableView, Equatable {
+    associatedtype Scale: ScaleView
+    associatedtype MaskShape: Shape
+    
+    var mark: CGFloat { get }
+    var bounds: ClosedRange<CGFloat> { get }
+    var cellBounds: ClosedRange<CGFloat> { get }
+    var step: CGFloat { get }
+    var cellHeight: CGFloat { get }
+    
+    var scale: Scale { get }
+    var maskShape: MaskShape { get }
+}
+
+extension VerticalRulerCellView {
+    static var fractions: Int { Scale.fractions }
+    
+    var cellBounds: ClosedRange<CGFloat> {
+        ClosedRange(uncheckedBounds: (mark - step / 2, mark + step / 2))
+    }
+    
+    var isComplete: Bool { bounds.contains(cellBounds) }
+    
+    var body: some View {
+        ZStack {
+            scale
+                .equatable()
+                .foregroundColor(.init(.label))
+                .clipShape(maskShape)
+            scale
+                .equatable()
+                .foregroundColor(.init(.tertiaryLabel))
+        }
+        .frame(height: cellHeight)
+    }
+
+    static func ==(_ lhs: Self, _ rhs: Self) -> Bool {
+        lhs.isComplete && rhs.isComplete
+    }
+}
