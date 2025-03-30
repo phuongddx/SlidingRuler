@@ -268,7 +268,7 @@ extension SlidingRuler {
             self.releaseRubberBand()
             self.endDragSession()
         } else if abs(value.velocity) > 90 {
-            self.applyInertia(initialVelocity: value.velocity)
+//            self.applyInertia(initialVelocity: value.velocity)
         } else {
             state = .idle
             self.endDragSession()
@@ -349,7 +349,8 @@ extension SlidingRuler {
 
     ///  Transforms any numerical value based the layout direction. /!\ not properly tested.
     func directionalValue<T: Numeric>(_ value: T) -> T {
-        value * (layoutDirection == .rightToLeft ? -1 : 1)
+//        value * (layoutDirection != .rightToLeft ? -1 : 1)
+        value
     }
 
     /// Transforms an offsetr based on the layout direction. /!\ not properly tested.
@@ -382,79 +383,6 @@ extension UIScrollView.DecelerationRate {
 
 // MARK: Mechanic Simulation
 extension SlidingRuler {
-
-    private func applyInertia(initialVelocity: CGFloat) {
-        func shiftOffset(by distance: CGSize) {
-            let newOffset = directionalOffset(self.referenceOffset + distance)
-            let newValue = self.value(fromOffset: newOffset)
-
-            self.tickIfNeeded(self.dragOffset, newOffset)
-
-            withoutAnimation {
-                self.setValue(newValue)
-                self.dragOffset = newOffset
-            }
-        }
-
-        referenceOffset = dragOffset
-
-        let rate = UIScrollView.DecelerationRate.ruler
-        let totalDistance = Mechanic.Inertia.totalDistance(forVelocity: initialVelocity, decelerationRate: rate)
-        let finalOffset = self.referenceOffset + .init(horizontal: totalDistance)
-
-        state = .flicking
-
-        if dragBounds.contains(finalOffset.width) {
-            let duration = Mechanic.Inertia.duration(forVelocity: initialVelocity, decelerationRate: rate)
-
-            animationTimer = .init(duration: duration, animations: { (progress, interval) in
-                let distance =  CGSize(horizontal: Mechanic.Inertia.distance(atTime: progress, v0: initialVelocity, decelerationRate: rate))
-                shiftOffset(by: distance)
-            }, completion: { (completed) in
-                if completed {
-                    self.state = .idle
-                    shiftOffset(by: .init(horizontal: totalDistance))
-                    self.snapIfNeeded()
-                    self.endDragSession()
-                } else {
-                    NextLoop { self.endDragSession() }
-                }
-            })
-        } else {
-            let allowedDistance = finalOffset.width.clamped(to: dragBounds) - self.referenceOffset.width
-            let duration = Mechanic.Inertia.time(toReachDistance: allowedDistance, forVelocity: initialVelocity, decelerationRate: rate)
-            animationTimer = .init(duration: duration, animations: { (progress, interval) in
-                let distance =  CGSize(horizontal: Mechanic.Inertia.distance(atTime: progress, v0: initialVelocity, decelerationRate: rate))
-                shiftOffset(by: distance)
-            }, completion: { (completed) in
-                if completed {
-                    shiftOffset(by: .init(horizontal: allowedDistance))
-                    let remainingVelocity = Mechanic.Inertia.velocity(atTime: duration, v0: initialVelocity, decelerationRate: rate)
-                    self.applyInertialRubber(remainingVelocity: remainingVelocity)
-                    self.endDragSession()
-                } else {
-                    NextLoop { self.endDragSession() }
-                }
-            })
-        }
-    }
-
-    private func applyInertialRubber(remainingVelocity: CGFloat) {
-        let duration = Mechanic.Spring.duration(forVelocity: abs(remainingVelocity), displacement: 0)
-        let targetOffset = dragOffset.width.nearestBound(of: dragBounds)
-
-        state = .springing
-
-        animationTimer = .init(duration: duration, animations: { (progress, interval) in
-            let delta = Mechanic.Spring.value(atTime: progress, v0: remainingVelocity, displacement: 0)
-            self.dragOffset = .init(horizontal: targetOffset + delta)
-        }, completion: { (completed) in
-            if completed {
-                self.dragOffset = .init(horizontal: targetOffset)
-                self.state = .idle
-            }
-        })
-    }
 
     /// Applies rubber effect to an off-range offset.
     private func applyRubber(to offset: CGSize) -> CGSize {
