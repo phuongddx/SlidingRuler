@@ -196,8 +196,6 @@ public struct SlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bina
             offset = self.offset(fromValue: value)
         }
 
-        print("------=>", offset.height)
-
         return (value, offset)
     }
 }

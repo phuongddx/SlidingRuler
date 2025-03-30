@@ -30,7 +30,15 @@
 import SwiftUI
 import CoreGeometry
 
-struct HorizontalDragGestureValue {
+protocol DragGestureValueProtocol {
+    var state: UIGestureRecognizer.State { get }
+    var translation: CGSize { get }
+    var velocity: CGFloat { get }
+    var startLocation: CGPoint { get }
+    var location: CGPoint { get }
+}
+
+struct HorizontalDragGestureValue: DragGestureValueProtocol {
     let state: UIGestureRecognizer.State
     let translation: CGSize
     let velocity: CGFloat
@@ -38,12 +46,21 @@ struct HorizontalDragGestureValue {
     let location: CGPoint
 }
 
-protocol HorizontalPanGestureReceiverViewDelegate: AnyObject {
+struct VerticalDragGestureValue: DragGestureValueProtocol {
+    let state: UIGestureRecognizer.State
+    let translation: CGSize
+    let velocity: CGFloat
+    let startLocation: CGPoint
+    let location: CGPoint
+}
+
+// MARK: - Common
+protocol PanGestureReceiverViewDelegate: AnyObject {
     func viewTouchedWithoutPan(_ view: UIView)
 }
 
-class HorizontalPanGestureReceiverView: UIView {
-    weak var delegate: HorizontalPanGestureReceiverViewDelegate?
+class PanGestureReceiverView: UIView {
+    weak var delegate: PanGestureReceiverViewDelegate?
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
@@ -57,12 +74,18 @@ extension View {
                                  perform action: @escaping (HorizontalDragGestureValue) -> ()) -> some View {
         self.overlay(HorizontalPanGesture(beginTouch: initialTouch, prematureEnd: prematureEnd, action: action))
     }
+
+    func onVerticalDragGesture(initialTouch: @escaping () -> () = { },
+                               prematureEnd: @escaping () -> () = { },
+                               perform action: @escaping (VerticalDragGestureValue) -> ()) -> some View {
+        self.overlay(VerticalPanGesture(beginTouch: initialTouch, prematureEnd: prematureEnd, action: action))
+    }
 }
 
 private struct HorizontalPanGesture: UIViewRepresentable {
     typealias Action = (HorizontalDragGestureValue) -> ()
     
-    class Coordinator: NSObject, UIGestureRecognizerDelegate, HorizontalPanGestureReceiverViewDelegate {
+    class Coordinator: NSObject, UIGestureRecognizerDelegate, PanGestureReceiverViewDelegate {
         private let beginTouch: () -> ()
         private let prematureEnd: () -> ()
         private let action: Action
@@ -115,7 +138,7 @@ private struct HorizontalPanGesture: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIView {
-        let view = HorizontalPanGestureReceiverView(frame: .init(size: .init(square: 42)))
+        let view = PanGestureReceiverView(frame: .init(size: .init(square: 42)))
         let pgr = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.panGestureHandler(_:)))
         view.delegate = context.coordinator
         pgr.delegate = context.coordinator

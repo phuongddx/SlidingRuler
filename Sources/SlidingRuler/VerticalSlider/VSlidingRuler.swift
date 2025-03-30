@@ -78,7 +78,11 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
     }
 
     /// Over-ranged drag rubber should be released.
-    private var isRubberBandNeedingRelease: Bool { !dragBounds.contains(dragOffset.width) }
+    private var isRubberBandNeedingRelease: Bool {
+        let bool = !dragBounds.contains(dragOffset.height)
+        print("isRubberBandNeedingRelease")
+        return bool
+    }
     /// Amount of units the ruler can translate in both direction before needing to refresh the cells and reset offset.
     private var cellWidthOverflow: CGFloat {
         let result = cellWidth * CGFloat(cellOverflow)
@@ -134,7 +138,7 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
         (renderedValue, renderedOffset) = renderingValues()
 
         return FlexibleHeightContainer {
-            ZStack(alignment: .init(horizontal: .center,
+            ZStack(alignment: .init(horizontal: .leading,
                                     vertical: .center)) {
                 Ruler(cells: self.cells,
                       step: self.step,
@@ -159,9 +163,9 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
                 $0.animation = .easeIn(duration: 0.1)
             }
         }
-        .onHorizontalDragGesture(initialTouch: firstTouchHappened,
-                                 prematureEnd: panGestureEndedPrematurely,
-                                 perform: horizontalDragAction(withValue:))
+        .onVerticalDragGesture(initialTouch: firstTouchHappened,
+                               prematureEnd: panGestureEndedPrematurely,
+                               perform: horizontalDragAction(withValue:))
     }
 
     private func renderingValues() -> (CGFloat, CGSize) {
@@ -227,7 +231,7 @@ extension VSlidingRuler {
     }
 
     /// Composite callback passed to the horizontal drag gesture recognizer.
-    private func horizontalDragAction(withValue value: HorizontalDragGestureValue) {
+    private func horizontalDragAction(withValue value: VerticalDragGestureValue) {
         switch value.state {
         case .began: horizontalDragBegan(value)
         case .changed: horizontalDragChanged(value)
@@ -237,7 +241,7 @@ extension VSlidingRuler {
     }
 
     /// Callback handling horizontal drag gesture begining.
-    private func horizontalDragBegan(_ value: HorizontalDragGestureValue) {
+    private func horizontalDragBegan(_ value: VerticalDragGestureValue) {
         editingChangedCallback(true)
         if state != .stoppedSpring {
             dragOffset = self.offset(fromValue: clampedValue ?? 0)
@@ -247,8 +251,9 @@ extension VSlidingRuler {
     }
 
     /// Callback handling horizontal drag gesture updating.
-    private func horizontalDragChanged(_ value: HorizontalDragGestureValue) {
-        let newOffset = self.directionalOffset(value.translation.horizontal + referenceOffset)
+    private func horizontalDragChanged(_ value: VerticalDragGestureValue) {
+        let newOffset = self.directionalOffset(CGSize(width: 0,
+                                                      height: value.translation.height + referenceOffset.height))
         let newValue = self.value(fromOffset: newOffset)
         
         self.tickIfNeeded(dragOffset, newOffset)
@@ -260,7 +265,7 @@ extension VSlidingRuler {
     }
 
     /// Callback handling horizontal drag gesture ending.
-    private func horizontalDragEnded(_ value: HorizontalDragGestureValue) {
+    private func horizontalDragEnded(_ value: VerticalDragGestureValue) {
         if isRubberBandNeedingRelease {
             self.releaseRubberBand()
             self.endDragSession()
@@ -346,7 +351,8 @@ extension VSlidingRuler {
 
     ///  Transforms any numerical value based the layout direction. /!\ not properly tested.
     func directionalValue<T: Numeric>(_ value: T) -> T {
-        value * (layoutDirection != .rightToLeft ? -1 : 1)
+        value * (layoutDirection == .rightToLeft ? -1 : 1)
+//        value
     }
 
     /// Transforms an offsetr based on the layout direction. /!\ not properly tested.
@@ -398,7 +404,7 @@ extension VSlidingRuler {
 
         let rate = UIScrollView.DecelerationRate.ruler
         let totalDistance = Mechanic.Inertia.totalDistance(forVelocity: initialVelocity, decelerationRate: rate)
-        let finalOffset = self.referenceOffset + .init(horizontal: totalDistance)
+        let finalOffset = self.referenceOffset + .init(vertical: totalDistance)
 
         state = .flicking
 
@@ -411,7 +417,7 @@ extension VSlidingRuler {
             }, completion: { (completed) in
                 if completed {
                     self.state = .idle
-                    shiftOffset(by: .init(horizontal: totalDistance))
+                    shiftOffset(by: .init(vertical: totalDistance))
                     self.snapIfNeeded()
                     self.endDragSession()
                 } else {
@@ -426,7 +432,7 @@ extension VSlidingRuler {
                 shiftOffset(by: distance)
             }, completion: { (completed) in
                 if completed {
-                    shiftOffset(by: .init(horizontal: allowedDistance))
+                    shiftOffset(by: .init(vertical: allowedDistance))
                     let remainingVelocity = Mechanic.Inertia.velocity(atTime: duration, v0: initialVelocity, decelerationRate: rate)
                     self.applyInertialRubber(remainingVelocity: remainingVelocity)
                     self.endDragSession()
@@ -445,10 +451,10 @@ extension VSlidingRuler {
 
         animationTimer = .init(duration: duration, animations: { (progress, interval) in
             let delta = Mechanic.Spring.value(atTime: progress, v0: remainingVelocity, displacement: 0)
-            self.dragOffset = .init(horizontal: targetOffset + delta)
+            self.dragOffset = .init(vertical: targetOffset + delta)
         }, completion: { (completed) in
             if completed {
-                self.dragOffset = .init(horizontal: targetOffset)
+                self.dragOffset = .init(vertical: targetOffset)
                 self.state = .idle
             }
         })
@@ -457,9 +463,9 @@ extension VSlidingRuler {
     /// Applies rubber effect to an off-range offset.
     private func applyRubber(to offset: CGSize) -> CGSize {
         let dragBounds = self.dragBounds
-        guard !dragBounds.contains(offset.width) else { return offset }
+        guard !dragBounds.contains(offset.height) else { return offset }
         
-        let tx = offset.width
+        let tx = offset.height
         let limit = tx.clamped(to: dragBounds)
         let delta = abs(tx - limit)
         let factor: CGFloat = tx - limit < 0 ? -1 : 1
@@ -468,23 +474,23 @@ extension VSlidingRuler {
         let rubberDelta = (1 - (1 / ((c * delta / d) + 1))) * d * factor
         let rubberTx = limit + rubberDelta
         
-        return .init(horizontal: rubberTx)
+        return .init(vertical: rubberTx)
     }
 
     /// Animates an off-range offset back in place
     private func releaseRubberBand() {
-        let targetOffset = dragOffset.width.clamped(to: dragBounds)
-        let delta = dragOffset.width - targetOffset
+        let targetOffset = dragOffset.height.clamped(to: dragBounds)
+        let delta = dragOffset.height - targetOffset
         let duration = Mechanic.Spring.duration(forVelocity: 0, displacement: abs(delta))
 
         state = .springing
 
         animationTimer = .init(duration: duration, animations: { (progress, interval) in
             let newDelta = Mechanic.Spring.value(atTime: progress, v0: 0, displacement: delta)
-            self.dragOffset = .init(horizontal: targetOffset + newDelta)
+            self.dragOffset = .init(vertical: targetOffset + newDelta)
         }, completion: { (completed) in
             if completed {
-                self.dragOffset = .init(horizontal: targetOffset)
+                self.dragOffset = .init(vertical: targetOffset)
                 self.state = .idle
             }
         })
@@ -511,7 +517,8 @@ extension VSlidingRuler {
     }
 
     private func tickIfNeeded(_ offset0: CGSize, _ offset1: CGSize) {
-        let width0 = offset0.width, width1 = offset1.width
+        print("tickIfNeeded")
+        let width0 = offset0.height, width1 = offset1.height
 
         let dragBounds = self.dragBounds
         guard dragBounds.contains(width0), dragBounds.contains(width1),

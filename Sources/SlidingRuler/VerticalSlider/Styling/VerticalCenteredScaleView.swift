@@ -81,15 +81,16 @@ extension VerticalNativeMarkedRulerCellView {
     }
     var displayMark: String {
         numberFormatter?.string(for: mark) ?? "\(mark.approximated())" }
+
     var body: some View {
         HStack {
             Text(verbatim: displayMark)
                 .font(Font.footnote.monospacedDigit())
                 .foregroundColor(markColor)
+                .lineLimit(1)
             cell
                 .equatable()
         }
-        .frame(width: 150)
         .fixedSize()
     }
 }
@@ -106,7 +107,7 @@ struct DefaultVerticalCenteredCellBody: VerticalNativeMarkedRulerCellView {
     }
 }
 
-struct VerticalCenteredCellBody: NativeRulerCellView {
+struct VerticalCenteredCellBody: VerticalNativeRulerCellView {
     var mark: CGFloat
     var bounds: ClosedRange<CGFloat>
     var step: CGFloat
@@ -152,4 +153,8 @@ public struct VerticalCenteredStyle: SlidingRulerStyle {
 
 #Preview {
     VSlideRulerExample()
+}
+
+#Preview {
+    HSlideRulerExample()
 }
