@@ -251,7 +251,7 @@ extension SlidingRuler {
 
     /// Callback handling horizontal drag gesture updating.
     private func horizontalDragChanged(_ value: HorizontalDragGestureValue) {
-        let newOffset = self.directionalOffset(value.translation.horizontal + referenceOffset)
+        let newOffset: CGSize = value.translation.horizontal + referenceOffset
         let newValue = self.value(fromOffset: newOffset)
         
         self.tickIfNeeded(dragOffset, newOffset)
@@ -288,13 +288,13 @@ extension SlidingRuler {
 
     /// Compute the value from the given ruler's offset.
     private func value(fromOffset offset: CGSize) -> CGFloat {
-        self.directionalValue(-CGFloat(offset.width / cellWidth) * step)
+        -CGFloat(offset.width / cellWidth) * step
     }
 
     /// Compute the ruler's offset from the given value.
     private func offset(fromValue value: CGFloat) -> CGSize {
         let width = -value * cellWidth / step
-        return self.directionalOffset(.init(horizontal: width))
+        return CGSize(horizontal: width)
     }
 
     /// Sets the value.
@@ -345,18 +345,6 @@ extension SlidingRuler {
         let deltaUp = abs(value - upper).approximated()
 
         return deltaDown < deltaUp ? lower : upper
-    }
-
-    ///  Transforms any numerical value based the layout direction. /!\ not properly tested.
-    func directionalValue<T: Numeric>(_ value: T) -> T {
-//        value * (layoutDirection != .rightToLeft ? -1 : 1)
-        value
-    }
-
-    /// Transforms an offsetr based on the layout direction. /!\ not properly tested.
-    func directionalOffset(_ offset: CGSize) -> CGSize {
-        let width = self.directionalValue(offset.width)
-        return .init(width: width, height: offset.height)
     }
 }
 
