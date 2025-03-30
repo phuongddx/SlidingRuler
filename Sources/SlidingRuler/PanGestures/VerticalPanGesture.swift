@@ -56,8 +56,6 @@ struct VerticalPanGesture: UIViewRepresentable {
         }
     }
     
-    @Environment(\.slidingRulerStyle) private var style
-    
     let beginTouch: () -> ()
     let prematureEnd: () -> ()
     let action: Action

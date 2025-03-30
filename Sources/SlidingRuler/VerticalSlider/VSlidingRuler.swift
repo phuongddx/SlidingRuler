@@ -190,6 +190,8 @@ public struct VSlidingRuler<V>: View where V: BinaryFloatingPoint, V.Stride: Bin
             value = clampedValue ?? 0
             offset = self.offset(fromValue: value)
         }
+        
+        print("renderingValues", value)
 
         return (value, offset)
     }
@@ -246,9 +248,11 @@ extension VSlidingRuler {
 
     /// Callback handling horizontal drag gesture updating.
     private func horizontalDragChanged(_ value: VerticalDragGestureValue) {
-        let newOffset = CGSize(width: 0,
-                               height: value.translation.height + referenceOffset.height)
+        let newOffset: CGSize = value.translation.vertical + referenceOffset
         let newValue = self.value(fromOffset: newOffset)
+
+        print("newOffset", newOffset)
+        print("newValue", newValue)
 
         self.tickIfNeeded(dragOffset, newOffset)
         
@@ -284,7 +288,7 @@ extension VSlidingRuler {
 
     /// Compute the value from the given ruler's offset.
     private func value(fromOffset offset: CGSize) -> CGFloat {
-        return -CGFloat(offset.width / cellWidth) * step
+        return -CGFloat(offset.height / cellWidth) * step
     }
 
     /// Compute the ruler's offset from the given value.

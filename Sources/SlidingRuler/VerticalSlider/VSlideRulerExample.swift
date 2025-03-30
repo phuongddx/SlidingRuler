@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct VSlideRulerExample: View {
-    @State var value: Double = 14
+    @State var value: Double = 15
     @Environment(\.slidingRulerStyle.cursorAlignment) var cursorAlignment
 
     let closedRange: ClosedRange<Double> = 11...17
@@ -55,7 +55,6 @@ struct HSlideRulerExample: View {
 
 #Preview {
     HSlideRulerExample()
-        .previewDisplayName("1231")
 }
 
 #Preview {
